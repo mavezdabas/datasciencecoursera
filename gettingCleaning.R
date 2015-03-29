@@ -171,15 +171,162 @@ dbClearResult(query)
 dbDisconnect(hg19)
 
 
+## HDF5
+
+source("http://bioconductor.org/biocLite.R")
+biocLite("hdf5")
+library(hdf5)
+
+## Web
+# Jeff Leek https://scholar.google.com/citations?user=HI-I6C0AAAAJ
+# Getting Data off web pages readLines()
+con <- url("http://scholar.google.com/citations?user=HI-I6C0AAAAJ&hl=en")
+htmlcode <- readLines(con)
+close(con)
+
+# Parsing with XML Package
+library(XML)
+
+url <- "http://scholar.google.com/citations?user=HI-I6C0AAAAJ&hl=en"
+html <- htmlTreeParse(url,useInternalNodes = TRUE)
+xpathSApply(html,path = "//title",xmlValue)
+xpathSApply(html,path = "//td[@id ='col-citedby']",xmlValue)
+
+# Get command with the Httr package
+library(httr)
+#GET is a command to get the URL using the GET Command
+html2 <- GET(url)
+#now e have to extraxt the content from the HTML page
+content <- content(html2,as="text")
+parsehtml <- htmlParse(content,asText = TRUE)
+xpathSApply(parsehtml,path = "//title",xmlValue)
+
+#Accessing websites with passwords
+# in this case we have to get the authenticatiom from the 
+# we can do this by adding authenticate() function in the GET command
+authenticate(user = "user",password = "passwd")
+
+# Using Handles
+# we dont have to keep authenticating if we have saved the handle.
+# see R-blogger to see the examples of R blogger to see the examples
+# for web scraping.
 
 
+## Getting Data from the API
+# API - Application Programme Interface.
+
+#######################--QUIZ - 2--##############################################
+
+# Answer (1)
+# New application using the Github
+clientID <- "e70c82ebac4e43e5f133"
+clientSecret <- "4b037333bfe29746ea8cf10923fa957fbe9baef0"
+tokenName <- "e70c82ebac4e43e5f133"
+tokenSecret <- "656ea15413c7267d944fa5c68d670e00b4b21a04"
+#
+myapp <- oauth_app("newDataScientist",key = clientID,secret = clientSecret)
+sig <- sign_oauth1.0(myapp,token = tokenName,token_secret = tokenSecret)
+
+homeGIT <- GET("https://api.github.com/users/jtleek/repos",sig)
+contentGit <- content(homeGIT)
 
 
+#######################------ WEEK 3 --------##############################
 
+########   Subsetting and Sorting
+set.seed(13435)
 
+X <- data.frame("var1" = sample(1:5), "var2" = sample(6:10), "var3"= sample(11:15))
+#make some values as NA
+X <- X[sample(1:5),]
+X$var2[c(1,3)] = NA
+X[,1]
+X[,"var1"]
+X[1:2,"var2"]
 
+X[(X$var3 >= 14 & X$var1 >= 4),]
+X[(X$var3 >= 14 | X$var1 >= 4),]
+X[which(X$var1 > 3),]
+X[,which(X$var1 > 3)]
+#sort
+sort(X$var1)
+sort(X$var3,decreasing = FALSE)
+sort(X$var2,na.last = TRUE)
+#ordering
+# if we wish to order the dataset which depends on the column 1
+# will show the value of the datatable as per the column 1
 
+X[order(X$var1),]
+X[order(X$var1,X$var3),]
+#plyr
+library(plyr)
+arrange(X,var1)
+arrange(X,desc(var1))
 
+#cbind
+Y <- cbind(X,rnorm(5))
+Yr <- rbind(X,rnorm(5))
+Yr
+Yl <- cbind(rnorm(5), X)
+Yl
+
+########   Summarizing Datasets
+restData <- read.csv("Restaurants.csv")
+head(restData,n = 3)
+summary(restData)
+str(restData)
+quantile(restData$councilDistrict,na.rm = TRUE)
+
+table(restData$zipCode,useNA = "ifany")
+table(restData$councilDistrict,restData$zipCode)
+
+#checking the missing values
+sum(is.na(restData$councilDistrict))
+sum(is.na(restData$zipCode))
+any(is.na(restData$councilDistrict))
+any(is.na(restData$policeDistrict))
+
+colSums(is.na(restData))
+all(colSums(is.na(restData)) == 0)
+
+#values with specific values
+table(restData$zipCode %in% c("21212"))
+table(restData$zipCode %in% c("21212", "21213"))
+# subset for the above condition  data
+restData[restData$zipCode %in% c("21212", "21213"),] # only the rows with 21212 and 2123 zipcodes
+#size of the dataset
+object.size(restData)
+print(object.size(restData),units = "Mb")
+
+########   Creating new Variables
+
+restData$nearMe <- restData$neighborhood %in% c("Roland Park", "Homaland")
+table(restData$nearMe)
+
+#if the zipcode is wrong
+restData$zipWrong <- ifelse(restData$zipCode < 0,TRUE,FALSE)
+table(restData$zipWrong,restData$zipCode < 0)
+#creating categorical data using cut
+
+#creating factor variables
+# Often times an experiment includes trials for different levels of some
+# explanatory variable. These levels are called factors.
+restData$zcf <- factor(restData$zipCode)
+restData$zcf[1:4]
+class(restData$zcf)
+#levels of factor variables
+yesno <- sample(c("yes","no"),size = 10,replace = TRUE)
+yesnofec <- factor(yesno,levels = c("yes","no"))
+relevel(yesnofec,ref = "yes")
+as.numeric(yesnofec)
+# cutting also produces the factor variables
+# using the mutate function
+library(plyr)
+library(Hmisc)
+restData2 <- mutate(restData,zipGroups = cut2(zipCode,g = 4))
+table(restData2$zipGroups)
+
+########   Reshaping Data
 
 
 
