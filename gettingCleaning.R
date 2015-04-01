@@ -327,6 +327,143 @@ restData2 <- mutate(restData,zipGroups = cut2(zipCode,g = 4))
 table(restData2$zipGroups)
 
 ########   Reshaping Data
+# our first goal is to get a tidu data set
+# 1. each variable should form own column
+# 2. each observation should form a row
+# 3. each table/file stores data of only one kind of abservation
+# Starting with reshaping
+library("reshape2")
+head(mtcars)
+# Melting data frames
+mtcars$carname <- rownames(mtcars)
+head(mtcars)
+carMelt <- melt(mtcars, id = c("carname","gear","cyl"),measure.vars = c("mpg","hp"))
+head(carMelt,n = 3)
+tail(carMelt,n = 3)
+# Casting data frames
+cylData <- dcast(carMelt,carMelt$cyl ~ carMelt$variable)
+dcast(carMelt,cyl ~ variable)
+#This will tell us that we 4cyl have mpg values of 11 and hp of 11 and so on.
+dcast(carMelt,cyl ~ variable,mean )
+# Averaging Values
+head(InsectSprays)
+tapply(InsectSprays$count,InsectSprays$spray,sum)
+# another way is by split
+spIns <- split(InsectSprays$count,InsectSprays$spray)
+spIns# list of the values of A and so on
+# now we can use lapply
+sprCount <- lapply(spIns,sum)
+sprCount
+unlist(sprCount)
+# another way is the plyr package
+library("plyr")
+ddply(.data = InsectSprays,.(spray),summarize,sum=sum(count))
+
+########   Managing Data dplyr  IMPORTANT
+# select
+# filter
+# arrabge
+# rename
+# mutate
+# summarize 
+library(dplyr)
+chicago <- readRDS("chicago.rds")
+names(chicago)
+
+#SELECT
+#see the columns starting with city and till dptp
+# this select statement is good as now we fdont have to use the $
+# indicies we can directly use the column names as paramaners and 
+# get the values out
+head(select(chicago,city:dptp))
+# all the columns except the given
+# all the columns except city to dptp
+head(select(chicago,-(city:dptp)))
+#if not dplye package
+i <- match("city",names(chicago))
+j <- match("dptp",names(chicago))
+head(chicago[,-(i:j)])
+
+#FILTERS
+# same as select we can refer the variabe names directly
+chic.f <- filter(chicago,pm25tmean2 > 30)
+head(chic.f)
+chic.f <- filter(chicago,pm25tmean2 > 30 & tmpd > 80)
+
+#ARRANGE 
+#to order the data of the data frame
+chicago <- arrange(chicago,date) # arranges the dates starting from
+                                  # oldest
+head(chicago)
+tail(chicago)
+# and if we want in the reverse order
+chicago <- arrange(chicago,desc(date))
+
+#RENAME
+# this is just used to rename a variable name in r
+chicago <- rename(chicago,pm25 = pm25tmean2,dewpoint = dptp)
+
+#MUTATE 
+# trasnform new variables or create new variables
+chicago <- mutate(chicago,pm25mean = pm25 - mean(pm25,na.rm = TRUE))
+head(select(chicago,pm25,pm25mean))
+#use the pipeline operator %>%
+
+########   Merging Data
+url1 <- "https://dl.dropboxusercontent.com/u/7710864/data/reviews-apr29.csv"
+url2 <- "https://dl.dropboxusercontent.com/u/7710864/data/solutions-apr29.csv"
+download.file(url1,destfile = "/Users/mavezsinghdabas/datasciencecoursera/reviews-apr29.csv",method = "curl")
+download.file(url2,destfile = "/Users/mavezsinghdabas/datasciencecoursera/solutions-apr29.csv",method = "curl")
+reviews <- read.csv("reviews-apr29.csv")
+solutions <- read.csv("solutions-apr29.csv")
+head(reviews,n = 2)
+# the solution id in the review table corresponds to the solutions
+# table id.
+head(solutions,n = 2)
+
+mergeData <- merge(reviews,solutions,by.x = "solution_id",by.y = "id",all = TRUE)
+head(mergeData)
+
+#default : by default it merges on all common column names
+intersect(names(reviews),names(solutions))
+mergeData2 <- merge(reviews,solutions,all = TRUE)
+head(mergeData2)
+
+#using join in the plyr package
+# this is good but not fast and it merges the data sets only based 
+# on the value of the id. not like the one which we used like
+# solution_id and id from different reslective tables
+install.packages("base64")
+library("base64")
+df1 <- sample(id = sample(1:10),x = norm(10))
+df1 <- sample(id = sample(1:10),y = rnorm(10))
+
+# if we have multiple data frames we can use the join from the plyr 
+# package because it is difficult to use merge for multiple dataframes
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
