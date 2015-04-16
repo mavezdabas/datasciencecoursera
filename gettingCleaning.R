@@ -133,6 +133,7 @@ ans5.data <- read.table("./data/ans5.csv",sep = ",", header = TRUE)
 #######################------ WEEK 2 --------##############################
 ## mySQL
 install.packages("RMySQL")
+library(RMySQL) 
 # dbConnect This fucnction is used to create a connection to a DBMS
 ucscDb <- dbConnect(MySQL(), user = "genome",host = "genome-mysql.cse.ucsc.edu")
 # uscsDb shall be an Handler for the connection.
@@ -440,30 +441,6 @@ df1 <- sample(id = sample(1:10),y = rnorm(10))
 
 # if we have multiple data frames we can use the join from the plyr 
 # package because it is difficult to use merge for multiple dataframes
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
