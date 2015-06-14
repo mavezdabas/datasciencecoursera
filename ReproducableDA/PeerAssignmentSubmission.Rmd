@@ -23,6 +23,7 @@ str(activity$date)
 steps_day <- data.frame(aggregate( cbind( activity$steps ) ~ activity$date , data = activity ,
                                    FUN = sum))
 colnames(steps_day) <- c("Date","Steps") 
+steps_day
 ```
 
 ### Make a histogram of the total number of steps taken each day
@@ -57,8 +58,9 @@ steps_interval <- aggregate( cbind( activity$steps ) ~ activity$interval, data =
 colnames(steps_interval) <- c("Interval","Steps") 
 max_value <- max(steps_interval$Steps)
 max_value
+library(dplyr)
 max_step <- filter(steps_interval,max_value == steps_interval$Steps)
-max_step[1,1]
+max_step
 ```
 
 

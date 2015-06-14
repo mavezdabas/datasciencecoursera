@@ -45,10 +45,12 @@ xyplot(activity$steps ~ activity$interval | activity$date,type = "l",
 steps_interval <- aggregate( cbind( activity$steps ) ~ activity$interval, data = activity ,
             FUN = sum )
 colnames(steps_interval) <- c("Interval","Steps") 
+head(steps_interval,n = 3)
 max_value <- max(steps_interval$Steps)
 max_value
+library(dplyr)
 max_step <- filter(steps_interval,max_value == steps_interval$Steps)
-max_step[1,1]
+max_step
 
 
 
@@ -132,6 +134,4 @@ str(activity_new)
        
 xyplot(activity_new$steps ~ activity_new$interval | activity_new$datType,type = "l",
        xlab = "Interval",ylab = "Steps")
-       
-## Now we have to create a RMarkdown file for this       
        
